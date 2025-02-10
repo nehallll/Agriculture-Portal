@@ -1,0 +1,25 @@
+package com.kisan.pojo;
+
+public enum FarmingType {
+	AGRICULTURE,
+    HORTICULTURE,
+    FLORICULTURE,
+    SERICULTURE,
+    APICULTURE,
+    AQUACULTURE,
+    MARICULTURE,
+    POULTRY,
+    DAIRY,
+    LIVESTOCK,
+    MIXED,
+    AGROFORESTRY,
+    ORGANIC,
+    URBAN,
+    PRECISION,
+    HYDROPONICS,
+    AEROPONICS,
+    AQUAPONICS,
+    VERTICAL,
+    MECHANIZED,
+    PERMACULTURE
+}
