@@ -109,7 +109,59 @@ public class ProductController {
     }
     
     
+    //add product for farmer
+    @PostMapping("/add")
+    public ResponseEntity<?> addProduct(@RequestPart("product") String productJson,  
+    		@RequestPart(value = "productImage", required = false) MultipartFile productImage) 
+    {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getCredentials() instanceof Long)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+        Long userId = (Long) authentication.getCredentials(); 
+        ObjectMapper objectMapper = new ObjectMapper();
+        ProductRequestDto product;
+        try {
+            product = objectMapper.readValue(productJson, ProductRequestDto.class);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid product json format!");
+        }
+        ApiResponse savedProduct = productService.addProduct(product, productImage, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
+    }
+
+    //update product details for farmer
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateProductDetails(
+            @RequestPart("product") ProductRequestDto product,
+            @RequestPart(value = "productImage", required = false) MultipartFile productImage,
+            @PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK)
+		        .body(productService.updateProduct(id, product, productImage));
+    }
+
+    //delete product for farmer
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(productService.deleteProductDetails(id));
+    }
+
+    //mark a product for sale
+    @PutMapping("/mark-sale/{id}")
+    public ResponseEntity<?> markForSale(@RequestBody SellProductRequestDto dto, @PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(productService.markForSale(dto, id));
+    }
     
+ // Get all products marked for sale
+    @GetMapping("/for-sale")
+    public ResponseEntity<?> getProductsForSale() {
+        List<ProductsDto> products = productService.getProductsMarkedForSale();
+        if (products.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.ok(products);
+    }
 
 }
-
