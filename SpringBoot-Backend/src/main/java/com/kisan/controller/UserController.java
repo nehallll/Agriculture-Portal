@@ -72,6 +72,21 @@ public class UserController {
     		return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
     	}
     }
+
+    
+    @GetMapping("/image/{id}")
+    public ResponseEntity<byte[]> getUserImage(@PathVariable Long id){
+    	 byte[] responseImage = userService.getUserImage(id);
+    	 return ResponseEntity.ok().contentType(MediaType.valueOf(userService.getImageType(id))).body(responseImage);
+    } 
+    
+    @GetMapping("/image")
+    public ResponseEntity<byte[]> getUserImageWithToken(){
+    	Long id = userService.getUserByJwt().getId();
+    	 byte[] responseImage = userService.getUserImage(id);
+    	 return ResponseEntity.ok().contentType(MediaType.valueOf(userService.getImageType(id))).body(responseImage);
+    } 
+    
     
     
     //Login API for users
@@ -144,6 +159,46 @@ public class UserController {
     @GetMapping("/get-user")
     public ResponseEntity<UserResponseDto> getUserById(){
     	return ResponseEntity.ok(userService.getUserByJwt());
+    }
+    
+    
+    
+    
+    
+    //list of user based on farming type for ADMIN
+    @GetMapping("/farming-type/{type}")
+    public ResponseEntity<?> getUsersByFarmingType(@PathVariable FarmingType type,
+    		@RequestParam(defaultValue = "0", required = false) int pageNumber,
+			@RequestParam(defaultValue = "2", required = false) int pageSize) {
+    	System.out.println("in get all users " + pageNumber + " " + pageSize);
+		List<UserListDto> list = userService.getUsersByFarmingType(type, pageNumber, pageSize);
+		if (list.isEmpty())
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		return ResponseEntity.ok(list);
+    }
+
+    
+    
+    
+    
+    //access all users by ADMIN
+    @GetMapping("/role/{role}")
+    public ResponseEntity<?> getUsersByRole(@PathVariable UserRole role,
+    		@RequestParam(defaultValue = "0", required = false) int pageNumber,
+			@RequestParam(defaultValue = "2", required = false) int pageSize) {
+    	System.out.println("in get all users " + pageNumber + " " + pageSize);
+		List<UserListDto> list = userService.getUsersByRole(role, pageNumber, pageSize);
+		if (list.isEmpty())
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		return ResponseEntity.ok(list);
+    }
+
+    
+    
+    //delete user by Administrator
+    @DeleteMapping("delete/{userId}")
+    public ResponseEntity<ApiResponse> deleteUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(userService.deleteUser(userId));
     }
 
 
