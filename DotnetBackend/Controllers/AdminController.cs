@@ -185,5 +185,73 @@ namespace AdminPortal.Controllers
             return Ok(new { Message = "Admin details fetched successfully.", Admin = adminDetails });
         }
 
+        // 3. Update Profile
+        [HttpPut("update-profile")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
+        {
+            var userIdClaim = User.FindFirst("user_id")?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized("Invalid token.");
+            }
+
+            long userId = long.Parse(userIdClaim);
+            var admin = await _context.Admin.FindAsync(userId);
+
+            if (admin == null)
+            {
+                return NotFound("Admin not found.");
+            }
+
+            admin.FirstName = request.FirstName;
+            admin.LastName = request.LastName;
+            admin.Mobile = request.Mobile;
+            admin.Email = request.Email;
+            admin.UpdatedAt = DateTime.UtcNow;
+
+            _context.Admin.Update(admin);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Profile updated successfully.", Admin = admin });
+        }
+
+        // 4. Change Password
+        [HttpPut("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            var userIdClaim = User.FindFirst("user_id")?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized("Invalid token.");
+            }
+
+            long userId = long.Parse(userIdClaim);
+            var admin = await _context.Admin.FindAsync(userId);
+
+            if (admin == null)
+            {
+                return NotFound("Admin not found.");
+            }
+
+            if (!VerifyPassword(admin.Password, admin.Salt, request.OldPassword))
+            {
+                return BadRequest("Old password is incorrect.");
+            }
+
+            var (hashedPassword, salt) = HashPassword(request.NewPassword);
+            admin.Password = hashedPassword;
+            admin.Salt = salt;
+            admin.UpdatedAt = DateTime.UtcNow;
+
+            _context.Admin.Update(admin);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Password changed successfully." });
+        }
+
     }
 }

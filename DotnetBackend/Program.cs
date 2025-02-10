@@ -15,6 +15,16 @@ namespace AdminPortal
 
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    policy =>
+                    {
+                        policy.AllowAnyOrigin()
+                              .AllowAnyMethod()
+                              .AllowAnyHeader();
+                    });
+            });
 
             var jwtSettings = builder.Configuration.GetSection("Jwt");
             var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]);
@@ -33,7 +43,6 @@ namespace AdminPortal
             ClockSkew = TimeSpan.Zero
         };
     });
-            // Add services to the container.
             builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddControllers();
@@ -48,7 +57,7 @@ namespace AdminPortal
 
             var app = builder.Build();
             app.UseCors("AllowAllOrigins");
-            // Use forwarded headers middleware BEFORE HTTPS redirection.
+
             app.UseForwardedHeaders();
 
             if (app.Environment.IsDevelopment())
