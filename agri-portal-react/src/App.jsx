@@ -18,10 +18,17 @@ import ChangePassword from './pages/ChangePassword';
 import UpdateProfile from './pages/UpdateProfile';
 import MyProducts from './pages/MyProducts';
 import AllProducts from './pages/AllProducts';
+import Posts from './pages/AddPost';
+import PostsList from './pages/PostsList';
+import ManageCategoryPosts from './pages/ManageCategoryPost';
+import ManageFarmingPosts from './pages/ManageFarmingPost';
+import FarmingPosts from './pages/LearnPage';
+import EditPost from './pages/EditPost';
 import { BuyingPage } from "./pages/BuyingPage";
 import { CartPage } from "./pages/CartPage";
 import { CartProvider } from "./pages/CartContext";
 import { OrderConfirmation } from "./pages/OrderConfirmation";
+import PostDetail from './pages/PostDetail';
 
 function App() {
   return (
@@ -47,9 +54,17 @@ function App() {
           <Route path='/users/update-profile' element={<UpdateProfile/>} />
           <Route path="/users/my-products" element={<MyProducts />} />
           <Route path="/admin/all-products" element={<AllProducts />} />
+          <Route path="/addposts" element={<Posts/>} />
+          <Route path="/posts/:category" element={<PostsList />} />
+          <Route path="/admin/addpost" element={<Posts/>} />
+          <Route path="/posts" element={<FarmingPosts />} />
+          <Route path="/manageposts" element={<ManageFarmingPosts />} />
+          <Route path="/admin/manage-posts/:categoryName" element={<ManageCategoryPosts />} />
+          <Route path="/admin/edit-post/:postId" element={<EditPost />} />
           <Route path="/user/buy" element={<BuyingPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
+          <Route path="/posts/:category/:postId" element={<PostDetail />} />
         </Routes>
       </BrowserRouter>
     </CartProvider>
